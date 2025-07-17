@@ -1,0 +1,13 @@
+# Requirements for YOLOv8 + Swin Transformer custom backbone
+ultralytics>=8.0.0
+# Pastikan versi torch sesuai dengan CUDA yang digunakan
+# Contoh untuk CUDA 11.8:
+torch>=1.12.0,<=2.2.0
+# Untuk Swin Transformer dan backbone custom, dependensi berikut biasanya sudah termasuk di ultralytics, tapi pastikan ada:
+torchvision
+numpy<=1.26.0
+opencv-python
+# Jupyter opsional untuk notebook
+jupyter
+# Untuk visualisasi
+matplotlib 
