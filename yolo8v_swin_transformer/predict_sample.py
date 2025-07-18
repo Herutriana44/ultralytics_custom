@@ -106,7 +106,7 @@ class YOLOPredictor:
             )
             
             if len(indices) > 0:
-                indices = indices.flatten()
+                indices = np.array(indices).flatten()
                 boxes = boxes[indices]
                 confidences = confidences[indices]
             else:
@@ -136,7 +136,7 @@ class YOLOPredictor:
         
         return img_draw
     
-    def predict_single_image(self, img_path, save_result=True):
+    def predict_single_image(self, img_path, save_result=True, output_path=None):
         """Predict on single image"""
         print(f"Predicting: {img_path}")
         
@@ -155,7 +155,8 @@ class YOLOPredictor:
         
         # Save result
         if save_result:
-            output_path = img_path.replace('.', '_predicted.')
+            if output_path is None:
+                output_path = img_path.replace('.', '_predicted.')
             cv2.imwrite(output_path, result_img)
             print(f"Result saved to: {output_path}")
         
@@ -192,6 +193,10 @@ class YOLOPredictor:
                     'confidences': confidences,
                     'num_detections': len(boxes)
                 })
+
+                if len(boxes) > 0:
+                    # save image 
+                    cv2.imwrite(img_path.replace('.png', '_custom_output.png'), result_img)
             except Exception as e:
                 print(f"Error processing {img_path}: {e}")
         
@@ -210,10 +215,13 @@ def main():
     )
     
     # Option 1: Predict single image
-    # predictor.predict_single_image('sample_image.jpg')
+    # img_path = '../dataset_medis/images/val/042.png'
+    # output_path = '../023_custom_output.png'  # Set your custom output path here
+    # boxes, confidences, result_img = predictor.predict_single_image(img_path, save_result=True, output_path=output_path)
+    # print(f"Saved predicted image with bounding boxes for {img_path} to {output_path}")
     
     # Option 2: Predict folder of images
-    sample_folder = '../dataset_medis/images/val'  # Use validation images as samples
+    sample_folder = '../dataset_medis/images/train'  # Use validation images as samples
     if os.path.exists(sample_folder):
         predictor.predict_folder(sample_folder)
     else:
