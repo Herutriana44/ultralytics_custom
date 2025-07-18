@@ -510,7 +510,7 @@ def test_integration_with_yolo_swin():
         traceback.print_exc()
         return False
 
-def test_performance_impact():
+def test_performance_impact(device=None):
     """Test performance impact of quality monitoring"""
     print("=" * 50)
     print("Testing Performance Impact")
@@ -526,9 +526,9 @@ def test_performance_impact():
 
         # Simulate training
         for i in range(150):
-            backbone_feat = torch.randn(1, 1024, 20, 20) * 0.5
-            neck_feat = torch.randn(1, 512, 40, 40) * 0.5
-            head_feat = torch.randn(1, 256, 80, 80) * 0.5
+            backbone_feat = torch.randn(1, 1024, 20, 20, device=device) * 0.5
+            neck_feat = torch.randn(1, 512, 40, 40, device=device) * 0.5
+            head_feat = torch.randn(1, 256, 80, 80, device=device) * 0.5
             monitor.monitor_medical_inference(backbone_feat, neck_feat, head_feat)
 
         # Benchmark with monitoring
@@ -539,9 +539,9 @@ def test_performance_impact():
         num_runs = 50
 
         for i in range(num_runs):
-            backbone_feat = torch.randn(1, 1024, 20, 20) * 0.5
-            neck_feat = torch.randn(1, 512, 40, 40) * 0.5
-            head_feat = torch.randn(1, 256, 80, 80) * 0.5
+            backbone_feat = torch.randn(1, 1024, 20, 20, device=device) * 0.5
+            neck_feat = torch.randn(1, 512, 40, 40, device=device) * 0.5
+            head_feat = torch.randn(1, 256, 80, 80, device=device) * 0.5
 
             result = monitor.monitor_medical_inference(backbone_feat, neck_feat, head_feat)
 
@@ -554,9 +554,9 @@ def test_performance_impact():
         start_time = time.time()
 
         for i in range(num_runs):
-            backbone_feat = torch.randn(1, 1024, 20, 20) * 0.5
-            neck_feat = torch.randn(1, 512, 40, 40) * 0.5
-            head_feat = torch.randn(1, 256, 80, 80) * 0.5
+            backbone_feat = torch.randn(1, 1024, 20, 20, device=device) * 0.5
+            neck_feat = torch.randn(1, 512, 40, 40, device=device) * 0.5
+            head_feat = torch.randn(1, 256, 80, 80, device=device) * 0.5
 
             # Just feature extraction without monitoring
             _ = FeatureExtractor.extract_statistical_features(backbone_feat)
@@ -580,10 +580,9 @@ def test_performance_impact():
             torch.cuda.reset_peak_memory_stats()
 
             # Run monitoring on GPU
-            device = torch.device('cuda')
-            backbone_feat = torch.randn(1, 1024, 20, 20, device=device) * 0.5
-            neck_feat = torch.randn(1, 512, 40, 40, device=device) * 0.5
-            head_feat = torch.randn(1, 256, 80, 80, device=device) * 0.5
+            backbone_feat = torch.randn(1, 1024, 20, 20, device='cuda') * 0.5
+            neck_feat = torch.randn(1, 512, 40, 40, device='cuda') * 0.5
+            head_feat = torch.randn(1, 256, 80, 80, device='cuda') * 0.5
 
             # Move features to CPU for monitoring (since monitoring is CPU-based)
             result = monitor.monitor_medical_inference(

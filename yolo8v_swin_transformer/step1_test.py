@@ -337,11 +337,14 @@ def test_integration():
         print(f"❌ Integration test failed: {e}")
         return False
 
-def test_memory_and_performance():
+def test_memory_and_performance(device=None):
     """Test memory usage and basic performance"""
     print("=" * 50)
     print("Testing Memory & Performance")
     print("=" * 50)
+
+    if device is None:
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     try:
         import time
@@ -358,8 +361,8 @@ def test_memory_and_performance():
         # Test with different batch sizes
         batch_sizes = [1, 2, 4]
         for batch_size in batch_sizes:
-            x = torch.randn(batch_size, 56, 56, 96)
-            focal = FocalModulation(dim=96)
+            x = torch.randn(batch_size, 56, 56, 96, device=device)
+            focal = FocalModulation(dim=96).to(device)
 
             # Measure memory before
             torch.cuda.empty_cache() if torch.cuda.is_available() else None
@@ -371,8 +374,8 @@ def test_memory_and_performance():
         print("2. Testing inference speed...")
 
         # Warm up
-        x = torch.randn(2, 56, 56, 96)
-        focal = FocalModulation(dim=96)
+        x = torch.randn(2, 56, 56, 96, device=device)
+        focal = FocalModulation(dim=96).to(device)
         for _ in range(5):
             _ = focal(x)
 
@@ -388,14 +391,14 @@ def test_memory_and_performance():
 
         print("3. Testing gradient memory...")
 
-        x = torch.randn(1, 28, 28, 48, requires_grad=True)
+        x = torch.randn(1, 28, 28, 48, requires_grad=True, device=device)
         block = SwinTransformerBlock(
             dim=48,
             input_resolution=(28, 28),
             num_heads=3,
             window_size=7,
             use_focal_modulation=True
-        )
+        ).to(device)
 
         out = block(x.view(1, 28*28, 48))
         loss = out.sum()

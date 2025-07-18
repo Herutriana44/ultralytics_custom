@@ -7,11 +7,13 @@ from models.backbone.yolo_backbone import yolo_swin_medium
 from train_custom_yolo_swin import YOLOSwinDetector, DetectionHead
 
 class YOLOPredictor:
-    def __init__(self, model_path='best_yoloswin_detector.pt', img_size=640, conf_threshold=0.5, iou_threshold=0.45):
+    def __init__(self, model_path='best_yoloswin_detector.pt', img_size=640, conf_threshold=0.5, iou_threshold=0.45, device=None):
+        if device is None:
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.img_size = img_size
         self.conf_threshold = conf_threshold
         self.iou_threshold = iou_threshold
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.device = device
         
         # Load model
         self.model = self.load_model(model_path)
@@ -207,11 +209,15 @@ class YOLOPredictor:
         return results
 
 def main():
-    # Example usage
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--device', type=str, default=None, help='cpu, cuda, atau None (auto)')
+    args = parser.parse_args()
     predictor = YOLOPredictor(
         model_path='best_yoloswin_detector.pt',
         conf_threshold=0.5,
-        iou_threshold=0.45
+        iou_threshold=0.45,
+        device=args.device
     )
     
     # Option 1: Predict single image

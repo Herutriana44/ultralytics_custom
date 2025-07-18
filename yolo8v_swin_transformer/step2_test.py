@@ -395,11 +395,14 @@ def test_integration():
         traceback.print_exc()
         return False
 
-def test_performance_comparison():
+def test_performance_comparison(device=None):
     """Compare performance between original and hybrid models"""
     print("=" * 50)
     print("Testing Performance Comparison")
     print("=" * 50)
+
+    if device is None:
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     try:
         # Import modules
@@ -413,10 +416,10 @@ def test_performance_comparison():
         print("1. Comparing C3F vs HybridC3F...")
 
         # Create comparable models
-        c3f_model = C3F(c1=64, c2=128, n=2)
-        hybrid_model = HybridC3F(c1=64, c2=128, n=2, swin_depth=1, img_size=56)
+        c3f_model = C3F(c1=64, c2=128, n=2).to(device)
+        hybrid_model = HybridC3F(c1=64, c2=128, n=2, swin_depth=1, img_size=56).to(device)
 
-        x = torch.randn(4, 64, 56, 56)  # Batch of 4 for better timing
+        x = torch.randn(4, 64, 56, 56, device=device)  # Batch of 4 for better timing
 
         # Compare parameters
         c3f_params = sum(p.numel() for p in c3f_model.parameters())
@@ -458,7 +461,7 @@ def test_performance_comparison():
         print("2. Testing backbone performance...")
 
         # Test backbone inference time
-        backbone = yolo_swin_medium()
+        backbone = yolo_swin_medium().to(device)
         backbone.eval()
 
         input_sizes = [(320, 320), (640, 640)]
@@ -466,7 +469,7 @@ def test_performance_comparison():
 
         for (h, w) in input_sizes:
             for batch_size in batch_sizes:
-                x_test = torch.randn(batch_size, 3, h, w)
+                x_test = torch.randn(batch_size, 3, h, w, device=device)
 
                 # Warm up
                 for _ in range(3):
@@ -486,14 +489,14 @@ def test_performance_comparison():
         print("3. Testing memory usage...")
 
         # Test peak memory usage (approximate)
-        model = yolo_swin_medium()
+        model = yolo_swin_medium().to(device)
 
         # Clear cache
         torch.cuda.empty_cache() if torch.cuda.is_available() else None
 
         # Test different input sizes
         for size in [320, 480, 640]:
-            x_mem = torch.randn(1, 3, size, size)
+            x_mem = torch.randn(1, 3, size, size, device=device)
 
             if torch.cuda.is_available():
                 model = model.cuda()

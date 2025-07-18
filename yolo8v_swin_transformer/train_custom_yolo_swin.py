@@ -138,8 +138,9 @@ def yolo_loss(pred, targets, img_size=640, num_classes=1, device='cpu'):
     return box_loss, obj_loss, cls_loss
 
 # --- Training Script ---
-def train():
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+def train(device=None):
+    if device is None:
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
     # Paths
     DATASET_DIR = '../dataset_medis'
     IMG_SIZE = 640

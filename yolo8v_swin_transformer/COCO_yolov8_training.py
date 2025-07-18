@@ -103,8 +103,9 @@ def yolo_loss(pred, targets, img_size=640, num_classes=80, device='cpu'):
     return box_loss, obj_loss, cls_loss
 
 # --- Training Script ---
-def train():
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+def train(device=None):
+    if device is None:
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
     # Ganti path berikut sesuai dataset COCO eksternal kamu
     COCO_TRAIN_IMG = '/content/train2014'
     COCO_TRAIN_ANN = '/content/annotations/instances_train2014.json'

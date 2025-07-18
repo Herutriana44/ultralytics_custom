@@ -1,5 +1,9 @@
 import os
 from ultralytics import YOLO
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--device', type=str, default='-1', help='cpu, 0, 0,1,2... atau -1 (auto)')
+args = parser.parse_args()
 
 # Path dataset
 DATASET_DIR = '../dataset_medis'
@@ -20,7 +24,7 @@ results = model.train(
     batch=8,
     project='runs/train',
     name='yolov8_swin_custom',
-    device=-1  # ganti -1 jika pakai CPU
+    device=args.device
 )
 
 # 2. Export Model
